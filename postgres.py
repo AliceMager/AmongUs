@@ -1,16 +1,19 @@
-from sqlalchemy import create_engine
-import logging
+from enum import Enum
+from sqlalchemy import Column, String, DateTime, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-LOGGER = logging.getLogger(__name__)
+SQLALCHEMY_DB_URL = 'postgresql://postgres:postgres@localhost:5432/amongus_db'
+engine = create_engine(SQLALCHEMY_DB_URL)
 
-def get_db_engine():
-    return create_engine('postgresql://{}:{}@{}/{}'.format('postgres', 'postgres', 'postgres:5432', 'amongus_db'))
+Session = sessionmaker(bind=engine)
+Session = Session()
 
-while True:
+Base = declarative_base()
+
+def get_db():
+    db = Session()
     try:
-        db_engine = get_db_engine().connect()
-        if db_engine:
-            break
-    except Exception as e:
-        LOGGER.warning(f"++++ Retrying connection to the db bc of the issue {str(e)}++++")
+        yield db
+    finally:
+        db.close()
