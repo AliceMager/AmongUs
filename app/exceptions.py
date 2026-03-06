@@ -11,3 +11,7 @@ class DataBaseNameErr(ValidationError):
 class UsernameError(ValidationError):
     def __init__(self, message="Invalid username, make sure your username is at least 3 letter long"):
         super().__init__(message, status_code=422)
+
+class IdNotFound(ValidationError):
+    def __init__(self, message="The provided id doesn't exist."):
+        super().__init__(message, status_code=422)
