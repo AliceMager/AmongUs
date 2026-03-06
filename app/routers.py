@@ -2,7 +2,7 @@ import datetime
 import uuid
 from fastapi import APIRouter
 from starlette import status
-
+from app.exceptions import IdNotFound
 from app.models.deployment import Deployment
 from app.db.postgres import Session
 from app.tables.deployments import Deployments, Status
@@ -20,3 +20,17 @@ async def create_deployment(deployment: Deployment):
     session.commit()
     session.close()
     return dep_id
+
+@router.get( '/deployments/{deployment_id}', status_code=status.HTTP_200_OK)
+async def get_deployment(dep_id: str):
+    session = Session()
+    deployment = session.get(Deployments, dep_id)
+    if not deployment:
+        raise IdNotFound
+
+    session.close()
+    return {
+        'db_name' : f'{deployment.db_name}',
+        'status': f'{deployment.status}',
+        'creation_time': f'{deployment.creation_time}'
+    }
