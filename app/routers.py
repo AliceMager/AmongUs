@@ -1,13 +1,15 @@
 import datetime
 import uuid
 from fastapi import APIRouter
+from starlette import status
+
 from app.models.deployment import Deployment
 from app.db.postgres import Session
 from app.tables.deployments import Deployments, Status
 from app.validator import validate_deployment
 router = APIRouter()
 
-@router.post("/deployments", tags=["users"])
+@router.post("/deployments",  status_code=status.HTTP_201_CREATED)
 async def create_deployment(deployment: Deployment):
     validate_deployment(deployment)
     session = Session()
